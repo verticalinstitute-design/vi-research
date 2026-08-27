@@ -161,26 +161,21 @@ export const supabaseStore: Store = {
   },
 
   async upsertAnswer(responseId, questionId, patch: AnswerPatch) {
-    const { data: existing, error: exError } = await sb()
-      .from("answers")
-      .select("*")
-      .eq("response_id", responseId)
-      .eq("question_id", questionId)
-      .maybeSingle();
-    throwIf(exError);
-    if (existing) {
-      const { data, error } = await sb()
-        .from("answers")
-        .update({ ...patch, updated_at: new Date().toISOString() })
-        .eq("id", existing.id)
-        .select()
-        .single();
-      throwIf(error);
-      return data as Answer;
-    }
+    // Atomic upsert (ON CONFLICT DO UPDATE) instead of select-then-branch:
+    // concurrent autosave requests for the same (response_id, question_id)
+    // would otherwise both see "no row" and race on INSERT, one hitting the
+    // unique constraint and 500ing.
     const { data, error } = await sb()
       .from("answers")
-      .insert({ response_id: responseId, question_id: questionId, ...patch })
+      .upsert(
+        {
+          response_id: responseId,
+          question_id: questionId,
+          ...patch,
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "response_id,question_id" }
+      )
       .select()
       .single();
     throwIf(error);
