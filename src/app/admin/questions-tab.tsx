@@ -311,14 +311,6 @@ export default function QuestionsTab({
                     {q.code}
                   </span>
                   <span className="text-xs text-vi-muted">{q.theme}</span>
-                  {q.source_refs.map((s) => (
-                    <span
-                      key={s}
-                      className="rounded-full bg-vi-ice px-2 py-0.5 text-[11px] font-bold text-vi-muted"
-                    >
-                      {s}
-                    </span>
-                  ))}
                   {!q.is_active && (
                     <span className="rounded-full bg-vi-ice-deep px-2 py-0.5 text-[11px] font-bold uppercase text-vi-muted">
                       Inactive
