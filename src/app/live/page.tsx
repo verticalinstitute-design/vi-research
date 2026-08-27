@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { ContactTag } from "@/components/ContactTag";
 import type { Question, ResponseRow } from "@/lib/types";
 import {
   api,
@@ -302,6 +303,9 @@ export default function LivePage() {
           </section>
         )}
       </div>
+      <div className="flex justify-center py-8">
+        <ContactTag />
+      </div>
     </main>
   );
 }
@@ -484,6 +488,9 @@ function SessionSetup({ onCreated }: { onCreated: (r: ResponseRow) => void }) {
             ← Back to start
           </Link>
         </p>
+        <div className="mt-10 flex justify-center">
+          <ContactTag />
+        </div>
       </div>
     </main>
   );

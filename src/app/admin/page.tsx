@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { ContactTag } from "@/components/ContactTag";
 import type { Answer, Question, ResponseRow } from "@/lib/types";
 import { api } from "@/lib/client";
 import QuestionsTab from "./questions-tab";
@@ -129,6 +130,9 @@ export default function AdminPage() {
           <QuestionsTab data={data} reload={reload} />
         )}
       </div>
+      <div className="flex justify-center py-8">
+        <ContactTag />
+      </div>
     </main>
   );
 }
@@ -155,7 +159,7 @@ function Login({ onSuccess }: { onSuccess: () => void }) {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-vi-navy px-6">
+    <main className="flex min-h-screen flex-col items-center justify-center gap-8 bg-vi-navy px-6">
       <form
         onSubmit={submit}
         className="w-full max-w-sm rounded-2xl bg-white p-7 shadow-[var(--shadow-card)]"
@@ -186,6 +190,7 @@ function Login({ onSuccess }: { onSuccess: () => void }) {
           </Link>
         </p>
       </form>
+      <ContactTag tone="dark" />
     </main>
   );
 }

@@ -7,6 +7,7 @@
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { ContactTag } from "@/components/ContactTag";
 import type { Question, ResponseRow } from "@/lib/types";
 import {
   api,
@@ -219,8 +220,7 @@ function SurveyInner() {
             Thank you{response ? `, ${response.name.split(" ")[0]}` : ""}.
           </h1>
           <p className="mt-4 text-white/80">
-            Your answers feed directly into the corporate hub revamp, the new
-            case-study strategy, and the enquiry form Sales asked for.
+            Your responses are valuable. They help us improve the website.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <button
@@ -235,6 +235,9 @@ function SurveyInner() {
             >
               Back to start
             </Link>
+          </div>
+          <div className="mt-10 w-full max-w-xs border-t border-white/10 pt-8">
+            <ContactTag tone="dark" />
           </div>
         </div>
       </main>
@@ -253,6 +256,9 @@ function SurveyInner() {
             Tap any question to edit. Skipped questions are fine to submit.
           </p>
         </header>
+        <div className="flex justify-center pb-3">
+          <ContactTag />
+        </div>
         <ul className="mx-auto w-full max-w-2xl flex-1 space-y-2 overflow-y-auto px-6 pb-4 [mask-image:linear-gradient(to_bottom,transparent,black_12px,black_calc(100%-12px),transparent)] [scrollbar-color:var(--color-vi-ice-deep)_transparent]">
           {questions.map((q, i) => {
             const d = drafts[q.id];
@@ -380,8 +386,9 @@ function SurveyInner() {
         </div>
       </section>
 
-      <footer className="flex items-center justify-center px-5 pb-5 text-[12px] text-vi-muted sm:px-8 sm:pb-6">
-        <p>
+      <footer className="relative flex items-center justify-center px-5 pb-5 sm:px-8 sm:pb-6">
+        <ContactTag />
+        <p className="absolute bottom-5 right-5 hidden text-[11px] text-vi-muted sm:right-8 sm:block">
           Autosaves as you type ·{" "}
           <button
             onClick={copyResumeLink}
@@ -500,8 +507,9 @@ function IdentityScreen({ onCreated }: { onCreated: (r: ResponseRow) => void }) 
 /** Fixed-viewport centered stage on the ice ground. */
 function Stage({ children }: { children: React.ReactNode }) {
   return (
-    <main className="flex h-dvh w-full items-center justify-center overflow-hidden bg-vi-ice px-6">
+    <main className="flex h-dvh w-full flex-col items-center justify-center gap-7 overflow-hidden bg-vi-ice px-6 py-6">
       {children}
+      <ContactTag />
     </main>
   );
 }
