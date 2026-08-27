@@ -27,12 +27,51 @@ export default function QuestionsTab({
   const [adding, setAdding] = useState(false);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState("");
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [overId, setOverId] = useState<string | null>(null);
+  const [localOrder, setLocalOrder] = useState<Question[] | null>(null);
 
-  const questions = [...data.questions].sort(
+  const serverOrder = [...data.questions].sort(
     (a, b) => a.sort_order - b.sort_order
   );
+  // While dragging (or just after a drop, before reload() lands) the list
+  // shows the optimistic local order instead of snapping back to the
+  // server's — otherwise every reorder flickers.
+  const questions = localOrder ?? serverOrder;
   const answerCount = (qid: string) =>
     data.answers.filter((a) => a.question_id === qid && a.body.trim()).length;
+
+  const persistOrder = async (ordered: Question[]) => {
+    setLocalOrder(ordered);
+    try {
+      await api("/api/admin/questions/reorder", {
+        method: "POST",
+        body: JSON.stringify({ ids: ordered.map((q) => q.id) }),
+      });
+      await reload();
+    } catch {
+      setNotice("Couldn't save the new order. Reloading.");
+      await reload();
+    } finally {
+      setLocalOrder(null);
+    }
+  };
+
+  const dropOn = (targetId: string) => {
+    if (!dragId || dragId === targetId) {
+      setDragId(null);
+      setOverId(null);
+      return;
+    }
+    const from = questions.findIndex((q) => q.id === dragId);
+    const to = questions.findIndex((q) => q.id === targetId);
+    const reordered = [...questions];
+    const [moved] = reordered.splice(from, 1);
+    reordered.splice(to, 0, moved);
+    setDragId(null);
+    setOverId(null);
+    persistOrder(reordered);
+  };
 
   const startEdit = (q: Question) => {
     setAdding(false);
@@ -107,25 +146,22 @@ export default function QuestionsTab({
     await reload();
   };
 
-  const moveBy = async (q: Question, dir: -1 | 1) => {
-    const ids = questions.map((x) => x.id);
-    const i = ids.indexOf(q.id);
+  const moveBy = (q: Question, dir: -1 | 1) => {
+    const i = questions.findIndex((x) => x.id === q.id);
     const j = i + dir;
-    if (j < 0 || j >= ids.length) return;
-    [ids[i], ids[j]] = [ids[j], ids[i]];
-    await api("/api/admin/questions/reorder", {
-      method: "POST",
-      body: JSON.stringify({ ids }),
-    });
-    await reload();
+    if (j < 0 || j >= questions.length) return;
+    const reordered = [...questions];
+    [reordered[i], reordered[j]] = [reordered[j], reordered[i]];
+    persistOrder(reordered);
   };
 
   return (
     <div>
       <div className="mb-4 flex items-center justify-between gap-3">
         <p className="text-sm text-vi-muted">
-          {questions.length} questions · changes apply to new and in-progress
-          responses immediately
+          {questions.length} questions · drag <span aria-hidden>⠿</span> to
+          reorder · changes apply to new and in-progress responses
+          immediately
         </p>
         <button
           onClick={() => {
@@ -214,28 +250,60 @@ export default function QuestionsTab({
         {questions.map((q, i) => (
           <li
             key={q.id}
-            className={`rounded-xl border bg-white p-4 ${
+            onDragOver={(e) => {
+              if (!dragId || dragId === q.id) return;
+              e.preventDefault();
+              e.dataTransfer.dropEffect = "move";
+              if (overId !== q.id) setOverId(q.id);
+            }}
+            onDrop={(e) => {
+              e.preventDefault();
+              dropOn(q.id);
+            }}
+            className={`rounded-xl border bg-white p-4 transition ${
               q.is_active ? "border-vi-border" : "border-dashed border-vi-border opacity-60"
+            } ${dragId === q.id ? "opacity-40" : ""} ${
+              overId === q.id && dragId && dragId !== q.id
+                ? "border-vi-primary ring-2 ring-vi-primary/30"
+                : ""
             }`}
           >
             <div className="flex items-start gap-3">
-              <div className="flex flex-col gap-0.5">
-                <button
-                  onClick={() => moveBy(q, -1)}
-                  disabled={i === 0}
-                  aria-label={`Move ${q.code} up`}
-                  className="rounded px-1 text-vi-muted hover:text-vi-primary disabled:opacity-30"
+              <div className="flex flex-col items-center gap-1 pt-0.5">
+                <span
+                  draggable
+                  onDragStart={(e) => {
+                    setDragId(q.id);
+                    e.dataTransfer.effectAllowed = "move";
+                  }}
+                  onDragEnd={() => {
+                    setDragId(null);
+                    setOverId(null);
+                  }}
+                  aria-hidden="true"
+                  title="Drag to reorder"
+                  className="cursor-grab select-none rounded px-1 py-0.5 text-base leading-none text-vi-muted hover:bg-vi-ice hover:text-vi-text active:cursor-grabbing"
                 >
-                  ▲
-                </button>
-                <button
-                  onClick={() => moveBy(q, 1)}
-                  disabled={i === questions.length - 1}
-                  aria-label={`Move ${q.code} down`}
-                  className="rounded px-1 text-vi-muted hover:text-vi-primary disabled:opacity-30"
-                >
-                  ▼
-                </button>
+                  ⠿
+                </span>
+                <div className="flex flex-col gap-0.5">
+                  <button
+                    onClick={() => moveBy(q, -1)}
+                    disabled={i === 0}
+                    aria-label={`Move ${q.code} up`}
+                    className="rounded px-1 text-[10px] text-vi-muted hover:text-vi-primary disabled:opacity-30"
+                  >
+                    ▲
+                  </button>
+                  <button
+                    onClick={() => moveBy(q, 1)}
+                    disabled={i === questions.length - 1}
+                    aria-label={`Move ${q.code} down`}
+                    className="rounded px-1 text-[10px] text-vi-muted hover:text-vi-primary disabled:opacity-30"
+                  >
+                    ▼
+                  </button>
+                </div>
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
