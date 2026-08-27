@@ -2,10 +2,18 @@
 
 import { useState } from "react";
 import type { ResponseRow } from "@/lib/types";
+import { api } from "@/lib/client";
 import type { AdminData } from "./page";
 
-export default function ResponsesTab({ data }: { data: AdminData }) {
+export default function ResponsesTab({
+  data,
+  reload,
+}: {
+  data: AdminData;
+  reload: () => Promise<void>;
+}) {
   const [openId, setOpenId] = useState<string | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
   const questions = [...data.questions].sort(
     (a, b) => a.sort_order - b.sort_order
   );
@@ -19,6 +27,25 @@ export default function ResponsesTab({ data }: { data: AdminData }) {
       )
     ).length;
     return { answered, total: active.length };
+  };
+
+  const remove = async (r: ResponseRow) => {
+    const label = r.mode === "live" ? r.session_name || "Live session" : r.name;
+    if (
+      !confirm(
+        `Permanently delete "${label}"'s response? This can't be undone.`
+      )
+    )
+      return;
+    setBusyId(r.id);
+    try {
+      await api(`/api/admin/responses/${r.id}`, { method: "DELETE" });
+      await reload();
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Delete failed.");
+    } finally {
+      setBusyId(null);
+    }
   };
 
   if (data.responses.length === 0) {
@@ -40,25 +67,27 @@ export default function ResponsesTab({ data }: { data: AdminData }) {
         const open = openId === r.id;
         return (
           <li key={r.id} className="rounded-xl border border-vi-border bg-white">
-            <button
-              onClick={() => setOpenId(open ? null : r.id)}
-              className="flex w-full flex-wrap items-center gap-3 p-4 text-left"
-            >
-              <span
-                className={`size-2.5 shrink-0 rounded-full ${
-                  r.status === "submitted" ? "bg-vi-green" : "bg-vi-amber"
-                }`}
-                title={r.status}
-              />
-              <span className="font-semibold">
-                {r.mode === "live" ? r.session_name || "Live session" : r.name}
-              </span>
-              <span className="text-sm text-vi-muted">
-                {r.mode === "live"
-                  ? `facilitated by ${r.name} · ${r.attendees.length} attendees`
-                  : `${r.role}${r.team ? ` · ${r.team}` : ""}`}
-              </span>
-              <span className="ml-auto flex items-center gap-3 text-xs text-vi-muted">
+            <div className="flex w-full flex-wrap items-center gap-3 p-4">
+              <button
+                onClick={() => setOpenId(open ? null : r.id)}
+                className="flex flex-1 flex-wrap items-center gap-3 text-left"
+              >
+                <span
+                  className={`size-2.5 shrink-0 rounded-full ${
+                    r.status === "submitted" ? "bg-vi-green" : "bg-vi-amber"
+                  }`}
+                  title={r.status}
+                />
+                <span className="font-semibold">
+                  {r.mode === "live" ? r.session_name || "Live session" : r.name}
+                </span>
+                <span className="text-sm text-vi-muted">
+                  {r.mode === "live"
+                    ? `facilitated by ${r.name} · ${r.attendees.length} attendees`
+                    : `${r.role}${r.team ? ` · ${r.team}` : ""}`}
+                </span>
+              </button>
+              <span className="flex items-center gap-3 text-xs text-vi-muted">
                 <span className="rounded-full bg-vi-ice px-2.5 py-0.5 font-bold uppercase">
                   {r.mode}
                 </span>
@@ -66,9 +95,23 @@ export default function ResponsesTab({ data }: { data: AdminData }) {
                   {p.answered}/{p.total} answered
                 </span>
                 <span>{new Date(r.created_at).toLocaleDateString("en-SG")}</span>
-                <span aria-hidden>{open ? "▴" : "▾"}</span>
+                <button
+                  onClick={() => remove(r)}
+                  disabled={busyId === r.id}
+                  className="font-semibold text-red-600/80 transition hover:text-red-600 disabled:opacity-40"
+                >
+                  {busyId === r.id ? "Deleting…" : "Delete"}
+                </button>
+                <button
+                  onClick={() => setOpenId(open ? null : r.id)}
+                  aria-label={open ? "Collapse" : "Expand"}
+                  aria-hidden="true"
+                  className="text-vi-muted"
+                >
+                  {open ? "▴" : "▾"}
+                </button>
               </span>
-            </button>
+            </div>
             {open && (
               <div className="border-t border-vi-border px-4 py-4">
                 {r.mode === "live" && r.attendees.length > 0 && (

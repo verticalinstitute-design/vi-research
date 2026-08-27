@@ -196,4 +196,15 @@ export const supabaseStore: Store = {
     throwIf(error);
     return (data ?? []) as Answer[];
   },
+
+  async deleteResponse(id) {
+    // answers.response_id has ON DELETE CASCADE, so this alone is enough.
+    const { data, error } = await sb()
+      .from("responses")
+      .delete()
+      .eq("id", id)
+      .select("id");
+    throwIf(error);
+    return (data?.length ?? 0) > 0;
+  },
 };

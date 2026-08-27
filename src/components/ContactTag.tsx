@@ -1,4 +1,6 @@
 const EMAIL = "paul@verticalinstitute.com";
+const EMAIL_CC = ["ryan.syauqi@verticalinstitute.com", "reza@verticalinstitute.com"];
+const MAILTO = `mailto:${EMAIL}?cc=${EMAIL_CC.map(encodeURIComponent).join(",")}`;
 const SLACK_URL = "https://vertical-institute.slack.com/archives/C04QQDQ54B0";
 
 /**
@@ -17,7 +19,7 @@ export function ContactTag({ tone = "light" }: { tone?: "light" | "dark" }) {
       </p>
       <div className="flex items-center gap-2">
         <a
-          href={`mailto:${EMAIL}`}
+          href={MAILTO}
           className={`rounded-full border px-3.5 py-1 text-[12px] font-semibold transition ${
             isDark
               ? "border-white/20 text-white/80 hover:border-white/50 hover:text-white"

@@ -206,4 +206,14 @@ export const localStore: Store = {
   listAllAnswers() {
     return withDb((db) => db.answers, false);
   },
+
+  deleteResponse(id) {
+    return withDb((db) => {
+      const existed = db.responses.some((r) => r.id === id);
+      if (!existed) return false;
+      db.responses = db.responses.filter((r) => r.id !== id);
+      db.answers = db.answers.filter((a) => a.response_id !== id);
+      return true;
+    });
+  },
 };

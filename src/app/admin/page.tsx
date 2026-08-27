@@ -125,7 +125,7 @@ export default function AdminPage() {
         ) : tab === "Synthesis" ? (
           <SynthesisTab data={data} />
         ) : tab === "Responses" ? (
-          <ResponsesTab data={data} />
+          <ResponsesTab data={data} reload={reload} />
         ) : (
           <QuestionsTab data={data} reload={reload} />
         )}

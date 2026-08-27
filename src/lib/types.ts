@@ -82,4 +82,6 @@ export interface Store {
 
   listResponses(): Promise<ResponseRow[]>;
   listAllAnswers(): Promise<Answer[]>;
+  /** Deletes a response and its answers. Returns false if it didn't exist. */
+  deleteResponse(id: string): Promise<boolean>;
 }
