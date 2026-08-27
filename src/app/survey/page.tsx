@@ -1,9 +1,13 @@
 "use client";
 
+// Respondent wizard — "Focus stage" treatment: every phase composes into a
+// fixed, non-scrollable viewport with the focal content centered; chrome
+// (progress, wayfinding, utilities) lives at the viewport edges.
+
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import type { Answer, Question, ResponseRow } from "@/lib/types";
+import type { Question, ResponseRow } from "@/lib/types";
 import {
   api,
   makeDebouncer,
@@ -121,7 +125,6 @@ function SurveyInner() {
     if (question) flush(question.id);
     setIndex(i);
     setPhase(nextPhase);
-    window.scrollTo(0, 0);
   };
 
   const next = () => {
@@ -133,7 +136,6 @@ function SurveyInner() {
 
   const skip = () => {
     updateDraft({ is_skipped: true });
-    // flush with the skip applied
     if (question && token) {
       saveAnswer(token, question.id, { ...draft, is_skipped: true }).catch(() => {});
     }
@@ -143,7 +145,6 @@ function SurveyInner() {
     } else {
       setIndex(index + 1);
     }
-    window.scrollTo(0, 0);
   };
 
   const copyResumeLink = async () => {
@@ -163,7 +164,6 @@ function SurveyInner() {
         body: JSON.stringify({ submit: true }),
       });
       setPhase("done");
-      window.scrollTo(0, 0);
     } catch (e) {
       showToast(e instanceof Error ? e.message : "Submit failed — try again");
     }
@@ -178,20 +178,25 @@ function SurveyInner() {
 
   if (error) {
     return (
-      <Shell>
-        <p className="text-vi-muted">{error}</p>
-        <Link href="/" className="mt-4 inline-block font-semibold text-vi-primary">
-          ← Back to start
-        </Link>
-      </Shell>
+      <Stage>
+        <div className="text-center">
+          <p className="text-vi-muted">{error}</p>
+          <Link
+            href="/"
+            className="mt-4 inline-block font-semibold text-vi-primary"
+          >
+            ← Back to start
+          </Link>
+        </div>
+      </Stage>
     );
   }
 
   if (phase === "loading") {
     return (
-      <Shell>
+      <Stage>
         <p className="text-vi-muted">Loading…</p>
-      </Shell>
+      </Stage>
     );
   }
 
@@ -210,10 +215,9 @@ function SurveyInner() {
 
   if (phase === "done") {
     return (
-      <main className="min-h-screen bg-vi-navy">
-        <div className="mx-auto flex min-h-screen max-w-xl flex-col justify-center px-6 py-16 text-white">
-          <p className="eyebrow text-white/70">Groundwork · Vertical Institute</p>
-          <h1 className="mt-3 text-4xl">
+      <main className="flex h-dvh w-full items-center justify-center overflow-hidden bg-vi-navy px-6">
+        <div className="flex max-w-xl flex-col items-center text-center text-white">
+          <h1 className="text-4xl">
             Thank you{response ? `, ${response.name.split(" ")[0]}` : ""}.
           </h1>
           <p className="mt-4 text-white/80">
@@ -221,7 +225,7 @@ function SurveyInner() {
             case-study strategy, and the enquiry form Sales asked for. The UX
             team will follow up on anything you flagged as unsure.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
             <button
               onClick={startFresh}
               className="rounded-[var(--radius-btn)] border-[1.5px] border-white/50 px-6 py-2.5 font-semibold text-white transition hover:border-white"
@@ -243,23 +247,24 @@ function SurveyInner() {
   if (phase === "review") {
     const answered = questions.filter((q) => drafts[q.id]?.body.trim()).length;
     return (
-      <Shell wide>
-        <p className="eyebrow text-vi-primary">Review your answers</p>
-        <h1 className="mt-2 text-3xl">
-          {answered} of {questions.length} answered
-        </h1>
-        <p className="mt-2 text-vi-muted">
-          Tap any question to edit. Skipped and unsure items are flagged — both
-          are fine to submit.
-        </p>
-        <ul className="mt-6 space-y-2">
+      <main className="flex h-dvh w-full flex-col overflow-hidden bg-vi-ice">
+        <header className="px-6 pt-8 pb-4 text-center">
+          <h1 className="text-3xl">
+            {answered} of {questions.length} answered
+          </h1>
+          <p className="mt-1.5 text-sm text-vi-muted">
+            Tap any question to edit. Skipped and unsure items are flagged —
+            both are fine to submit.
+          </p>
+        </header>
+        <ul className="mx-auto w-full max-w-2xl flex-1 space-y-2 overflow-y-auto px-6 pb-4 [mask-image:linear-gradient(to_bottom,transparent,black_12px,black_calc(100%-12px),transparent)] [scrollbar-color:var(--color-vi-ice-deep)_transparent]">
           {questions.map((q, i) => {
             const d = drafts[q.id];
             return (
-              <li key={q.id}>
+              <li key={q.id} className="first:mt-3 last:mb-3">
                 <button
                   onClick={() => goTo(i)}
-                  className="w-full rounded-xl border border-vi-border bg-white p-4 text-left transition hover:border-vi-primary"
+                  className="w-full rounded-xl border border-transparent bg-white p-4 text-left shadow-[0_4px_14px_rgba(20,30,77,0.06)] transition hover:border-vi-primary"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <span className="font-heading text-sm font-bold text-vi-primary">
@@ -286,8 +291,8 @@ function SurveyInner() {
             );
           })}
         </ul>
-        <div className="sticky bottom-0 -mx-6 mt-6 border-t border-vi-border bg-white/95 px-6 py-4 backdrop-blur">
-          <div className="flex items-center justify-between gap-3">
+        <footer className="border-t border-vi-border bg-white/90 px-6 py-4 backdrop-blur">
+          <div className="mx-auto flex w-full max-w-2xl items-center justify-between gap-3">
             <button
               onClick={copyResumeLink}
               className="text-sm font-semibold text-vi-primary"
@@ -301,113 +306,121 @@ function SurveyInner() {
               Submit my answers
             </button>
           </div>
-        </div>
+        </footer>
         {toast && <Toast msg={toast} />}
-      </Shell>
+      </main>
     );
   }
 
-  // question phase
+  // question phase — the Focus stage
   if (!question) return null;
-  const themeQuestions = questions.filter((q) => q.theme === question.theme);
-  const themeIndex = themeQuestions.findIndex((q) => q.id === question.id);
 
   return (
-    <Shell>
-      <div className="flex items-center justify-between">
-        <p className="eyebrow text-vi-primary">{question.theme}</p>
-        <p className="text-xs font-semibold text-vi-muted">
-          {index + 1} / {questions.length}
-        </p>
-      </div>
+    <main className="relative flex h-dvh w-full flex-col overflow-hidden bg-vi-ice">
       <div
-        className="mt-3 h-1.5 overflow-hidden rounded-full bg-vi-ice-deep"
+        className="absolute inset-x-0 top-0 h-1 bg-vi-ice-deep"
         role="progressbar"
         aria-valuenow={index + 1}
         aria-valuemin={1}
         aria-valuemax={questions.length}
       >
         <div
-          className="h-full rounded-full bg-vi-primary transition-all"
+          className="h-full bg-vi-primary transition-all duration-300"
           style={{ width: `${((index + 1) / questions.length) * 100}%` }}
         />
       </div>
-      <p className="mt-1.5 text-xs text-vi-muted">
-        Question {themeIndex + 1} of {themeQuestions.length} in this theme
-      </p>
 
-      <h1 className="mt-6 text-2xl leading-snug sm:text-[28px]">
-        {question.prompt}
-      </h1>
-      <p className="mt-3 rounded-xl bg-vi-ice px-4 py-3 text-sm text-vi-muted">
-        <span className="font-semibold text-vi-text">Why we&apos;re asking: </span>
-        {question.helper}
-      </p>
+      <header className="flex items-baseline justify-between px-5 pt-5 sm:px-8 sm:pt-6">
+        <p className="text-[13px] font-semibold text-vi-muted">
+          {question.theme}
+        </p>
+        <p className="font-heading text-[13px] font-bold tabular-nums">
+          {index + 1}
+          <span className="text-vi-muted"> / {questions.length}</span>
+        </p>
+      </header>
 
-      <textarea
-        value={draft.body}
-        onChange={(e) => updateDraft({ body: e.target.value })}
-        onBlur={() => flush(question.id)}
-        placeholder="Type your answer — rough notes are perfect…"
-        rows={7}
-        autoFocus
-        className="mt-5 w-full rounded-xl border border-vi-border p-4 text-[15.5px] leading-relaxed transition focus:border-vi-primary"
-      />
+      <section className="flex min-h-0 w-full flex-1 flex-col items-center justify-center px-5 sm:px-6">
+        <div className="flex w-full max-w-[680px] flex-col items-center text-center">
+          <h1 className="font-heading text-[clamp(21px,3.2vw,34px)] leading-[1.25] font-bold tracking-[-0.5px]">
+            {question.prompt}
+          </h1>
+          <p className="mt-3 max-w-[52ch] text-[14.5px] leading-relaxed text-vi-muted">
+            {question.helper}
+          </p>
 
-      <button
-        onClick={() => updateDraft({ is_unsure: !draft.is_unsure })}
-        aria-pressed={draft.is_unsure}
-        className={`mt-3 flex w-full items-center gap-2.5 rounded-xl border px-4 py-3 text-left text-sm transition ${
-          draft.is_unsure
-            ? "border-vi-amber bg-amber-50 font-semibold text-vi-text"
-            : "border-vi-border text-vi-muted hover:border-vi-amber"
-        }`}
-      >
-        <span
-          className={`flex size-4.5 shrink-0 items-center justify-center rounded border ${
-            draft.is_unsure
-              ? "border-vi-amber bg-vi-amber text-white"
-              : "border-vi-border bg-white"
-          }`}
-          aria-hidden
-        >
-          {draft.is_unsure && "✓"}
-        </span>
-        I&apos;m unsure — this needs checking before we rely on it
-      </button>
+          <textarea
+            value={draft.body}
+            onChange={(e) => updateDraft({ body: e.target.value })}
+            onBlur={() => flush(question.id)}
+            placeholder="Type your answer — rough notes are perfect…"
+            rows={6}
+            autoFocus
+            className="mt-6 w-full resize-none rounded-2xl border border-transparent bg-white p-5 text-left text-[15.5px] leading-relaxed caret-vi-primary shadow-[0_16px_40px_rgba(20,30,77,0.10)] transition placeholder:text-vi-muted/70 focus:border-vi-primary focus:outline-none sm:mt-8"
+          />
 
-      <div className="mt-6 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => (index === 0 ? undefined : goTo(index - 1))}
-            disabled={index === 0}
-            className="text-sm font-semibold text-vi-muted transition hover:text-vi-text disabled:opacity-40"
-          >
-            ← Back
-          </button>
-          <button onClick={skip} className="text-sm font-semibold text-vi-muted transition hover:text-vi-text">
-            Skip
-          </button>
+          <div className="mt-4 flex w-full flex-wrap items-center justify-between gap-3">
+            <button
+              onClick={() => updateDraft({ is_unsure: !draft.is_unsure })}
+              aria-pressed={draft.is_unsure}
+              className={`flex items-center gap-2 rounded-full border px-4 py-2 text-[13px] font-semibold transition ${
+                draft.is_unsure
+                  ? "border-vi-amber bg-white text-vi-text"
+                  : "border-vi-border bg-white/60 text-vi-muted hover:border-vi-amber hover:text-vi-text"
+              }`}
+            >
+              <span
+                className={`size-2 rounded-full ${
+                  draft.is_unsure ? "bg-vi-amber" : "bg-vi-ice-deep"
+                }`}
+                aria-hidden
+              />
+              Needs checking
+            </button>
+            <div className="flex items-center gap-5">
+              <button
+                onClick={skip}
+                className="text-[14px] font-semibold text-vi-muted transition hover:text-vi-text"
+              >
+                Skip
+              </button>
+              <button
+                onClick={next}
+                className="rounded-[var(--radius-btn)] bg-vi-primary px-7 py-3 text-[15px] font-semibold text-white shadow-[var(--shadow-glow)] transition hover:bg-vi-primary-dark"
+              >
+                {index + 1 === questions.length ? "Review answers" : "Next →"}
+              </button>
+            </div>
+          </div>
         </div>
-        <button
-          onClick={next}
-          className="rounded-[var(--radius-btn)] bg-vi-primary px-7 py-3 font-semibold text-white shadow-[var(--shadow-glow)] transition hover:bg-vi-primary-dark"
-        >
-          {index + 1 === questions.length ? "Review answers" : "Next →"}
-        </button>
-      </div>
+      </section>
 
-      <div className="mt-8 flex items-center justify-between border-t border-vi-border pt-4">
-        <p className="text-xs text-vi-muted">Autosaves as you type</p>
+      <footer className="flex items-center justify-between px-5 pb-5 text-[12px] text-vi-muted sm:px-8 sm:pb-6">
+        <button
+          onClick={() => (index === 0 ? undefined : goTo(index - 1))}
+          disabled={index === 0}
+          className="font-semibold transition hover:text-vi-text disabled:opacity-40"
+        >
+          ← Back
+        </button>
+        <p className="hidden sm:block">
+          Autosaves as you type ·{" "}
+          <button
+            onClick={copyResumeLink}
+            className="font-semibold text-vi-primary"
+          >
+            Continue later
+          </button>
+        </p>
         <button
           onClick={copyResumeLink}
-          className="text-xs font-semibold text-vi-primary"
+          className="font-semibold text-vi-primary sm:hidden"
         >
-          Continue later — copy resume link
+          Continue later
         </button>
-      </div>
+      </footer>
       {toast && <Toast msg={toast} />}
-    </Shell>
+    </main>
   );
 }
 
@@ -439,87 +452,83 @@ function IdentityScreen({ onCreated }: { onCreated: (r: ResponseRow) => void }) 
   };
 
   return (
-    <Shell>
-      <p className="eyebrow text-vi-primary">Before we start</p>
-      <h1 className="mt-2 text-3xl">Who&apos;s answering?</h1>
-      <p className="mt-2 text-vi-muted">
-        So the UX team can follow up on your answers — especially the ones that
-        point to specific clients or need checking.
-      </p>
-      <form onSubmit={start} className="mt-6 space-y-4">
-        <Field label="Full name" required>
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            autoFocus
-            className="w-full rounded-xl border border-vi-border p-3 transition focus:border-vi-primary"
-          />
-        </Field>
-        <Field label="Role / title" required>
-          <input
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-            required
-            placeholder="e.g. Corporate Sales Manager"
-            className="w-full rounded-xl border border-vi-border p-3 transition focus:border-vi-primary"
-          />
-        </Field>
-        <Field label="Team">
-          <div className="flex flex-wrap gap-2">
-            {TEAMS.map((t) => (
-              <button
-                key={t}
-                type="button"
-                onClick={() => setTeam(t)}
-                aria-pressed={team === t}
-                className={`rounded-full border px-4 py-1.5 text-sm font-semibold transition ${
-                  team === t
-                    ? "border-2 border-vi-primary bg-vi-ice text-vi-primary"
-                    : "border-vi-border text-vi-muted hover:border-vi-primary"
-                }`}
-              >
-                {t}
-              </button>
-            ))}
-          </div>
-        </Field>
-        <Field label="Email (optional)">
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="For follow-ups only"
-            className="w-full rounded-xl border border-vi-border p-3 transition focus:border-vi-primary"
-          />
-        </Field>
-        {error && <p className="text-sm font-semibold text-red-600">{error}</p>}
-        <button
-          type="submit"
-          disabled={busy}
-          className="rounded-[var(--radius-btn)] bg-vi-primary px-7 py-3 font-semibold text-white shadow-[var(--shadow-glow)] transition hover:bg-vi-primary-dark disabled:opacity-60"
-        >
-          {busy ? "Starting…" : "Begin — 20 questions"}
-        </button>
-      </form>
-    </Shell>
+    <Stage>
+      <div className="w-full max-w-md">
+        <div className="text-center">
+          <h1 className="text-3xl">Who&apos;s answering?</h1>
+          <p className="mx-auto mt-2 max-w-[42ch] text-sm text-vi-muted">
+            So the UX team can follow up on your answers — especially the ones
+            that point to specific clients or need checking.
+          </p>
+        </div>
+        <form onSubmit={start} className="mt-7 space-y-4">
+          <Field label="Full name" required>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              autoFocus
+              className="w-full rounded-xl border border-transparent bg-white p-3 shadow-[0_4px_14px_rgba(20,30,77,0.06)] transition focus:border-vi-primary focus:outline-none"
+            />
+          </Field>
+          <Field label="Role / title" required>
+            <input
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              required
+              placeholder="e.g. Corporate Sales Manager"
+              className="w-full rounded-xl border border-transparent bg-white p-3 shadow-[0_4px_14px_rgba(20,30,77,0.06)] transition placeholder:text-vi-muted/70 focus:border-vi-primary focus:outline-none"
+            />
+          </Field>
+          <Field label="Team">
+            <div className="flex flex-wrap gap-2">
+              {TEAMS.map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => setTeam(t)}
+                  aria-pressed={team === t}
+                  className={`rounded-full border px-4 py-1.5 text-sm font-semibold transition ${
+                    team === t
+                      ? "border-2 border-vi-primary bg-white text-vi-primary"
+                      : "border-vi-border bg-white/60 text-vi-muted hover:border-vi-primary"
+                  }`}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          </Field>
+          <Field label="Email (optional)">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="For follow-ups only"
+              className="w-full rounded-xl border border-transparent bg-white p-3 shadow-[0_4px_14px_rgba(20,30,77,0.06)] transition placeholder:text-vi-muted/70 focus:border-vi-primary focus:outline-none"
+            />
+          </Field>
+          {error && (
+            <p className="text-sm font-semibold text-red-600">{error}</p>
+          )}
+          <button
+            type="submit"
+            disabled={busy}
+            className="w-full rounded-[var(--radius-btn)] bg-vi-primary px-7 py-3 font-semibold text-white shadow-[var(--shadow-glow)] transition hover:bg-vi-primary-dark disabled:opacity-60"
+          >
+            {busy ? "Starting…" : "Begin — 20 questions"}
+          </button>
+        </form>
+      </div>
+    </Stage>
   );
 }
 
-function Shell({
-  children,
-  wide,
-}: {
-  children: React.ReactNode;
-  wide?: boolean;
-}) {
+/** Fixed-viewport centered stage on the ice ground. */
+function Stage({ children }: { children: React.ReactNode }) {
   return (
-    <main className="min-h-screen bg-white">
-      <div
-        className={`mx-auto px-6 py-10 sm:py-14 ${wide ? "max-w-2xl" : "max-w-xl"}`}
-      >
-        {children}
-      </div>
+    <main className="flex h-dvh w-full items-center justify-center overflow-hidden bg-vi-ice px-6">
+      {children}
     </main>
   );
 }
@@ -534,7 +543,7 @@ function Field({
   children: React.ReactNode;
 }) {
   return (
-    <label className="block">
+    <label className="block text-left">
       <span className="mb-1.5 block text-sm font-semibold">
         {label}
         {required && <span className="text-vi-primary"> *</span>}
@@ -568,7 +577,7 @@ function Toast({ msg }: { msg: string }) {
   return (
     <div
       role="status"
-      className="fixed bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-vi-navy px-5 py-2.5 text-sm font-semibold text-white shadow-lg"
+      className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-full bg-vi-navy px-5 py-2.5 text-sm font-semibold text-white shadow-lg"
     >
       {msg}
     </div>
