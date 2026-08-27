@@ -429,8 +429,8 @@ function IdentityScreen({ onCreated }: { onCreated: (r: ResponseRow) => void }) 
         <div className="text-center">
           <h1 className="text-3xl">Who&apos;s answering?</h1>
           <p className="mx-auto mt-2 max-w-[42ch] text-sm text-vi-muted">
-            So the UX team can follow up on your answers, especially the ones
-            that point to specific clients.
+            A few details so we know who to follow up with if we need more
+            context.
           </p>
         </div>
         <form onSubmit={start} className="mt-7 space-y-4">
@@ -448,7 +448,7 @@ function IdentityScreen({ onCreated }: { onCreated: (r: ResponseRow) => void }) 
               value={role}
               onChange={(e) => setRole(e.target.value)}
               required
-              placeholder="e.g. Corporate Sales Manager"
+              placeholder="Corporate Solutions Manager"
               className="w-full rounded-xl border border-transparent bg-white p-3 shadow-[0_4px_14px_rgba(20,30,77,0.06)] transition placeholder:text-vi-muted/70 focus:border-vi-primary focus:outline-none"
             />
           </Field>
