@@ -1,69 +1,79 @@
-import Image from "next/image";
+import Link from "next/link";
+
+const THEMES = [
+  { code: "A", label: "The buyer & the journey", count: 4 },
+  { code: "B", label: "Objections & competition", count: 4 },
+  { code: "C", label: "Offer & demand", count: 4 },
+  { code: "D", label: "Proof & assets", count: 5 },
+  { code: "E", label: "Enablement & forward", count: 3 },
+];
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <main className="min-h-screen bg-vi-ice">
+      <div className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center px-6 py-16">
+        <p className="eyebrow text-vi-primary">
+          Vertical Institute · Internal research
+        </p>
+        <h1 className="mt-3 text-4xl leading-tight tracking-tight sm:text-5xl">
+          Help us rebuild the corporate website around what actually happens in
+          your deals.
+        </h1>
+        <p className="mt-5 max-w-xl text-lg text-vi-muted">
+          20 questions about your corporate deals — buyers, objections, proof,
+          and what would help you sell. Your answers feed directly into the B2B
+          website revamp.
+        </p>
+
+        <div className="mt-8 rounded-2xl border border-vi-border bg-white p-6 shadow-[var(--shadow-card)]">
+          <div className="flex flex-wrap gap-2">
+            {THEMES.map((t) => (
+              <span
+                key={t.code}
+                className="rounded-full border border-vi-border bg-vi-ice px-3 py-1 text-xs font-semibold text-vi-text"
+              >
+                {t.code} · {t.label}
+                <span className="ml-1.5 text-vi-muted">{t.count}</span>
+              </span>
+            ))}
+          </div>
+          <ul className="mt-5 space-y-2 text-sm text-vi-muted">
+            <li className="flex gap-2">
+              <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-vi-green" />
+              One question at a time — takes 15–20 minutes, honest and rough
+              beats polished.
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-vi-green" />
+              Everything autosaves. Stop anytime and continue later from any
+              device.
+            </li>
+            <li className="flex gap-2">
+              <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-vi-green" />
+              Not sure about something? Flag it — knowing what needs checking
+              helps too.
+            </li>
+          </ul>
+          <Link
+            href="/survey"
+            className="mt-6 inline-block rounded-[var(--radius-btn)] bg-vi-primary px-7 py-3 font-semibold text-white shadow-[var(--shadow-glow)] transition hover:bg-vi-primary-dark"
           >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            Start answering →
+          </Link>
         </div>
-      </main>
-    </div>
+
+        <p className="mt-8 text-xs text-vi-muted">
+          Running the group session?{" "}
+          <Link href="/live" className="font-semibold text-vi-primary">
+            Open the facilitator console
+          </Link>
+          <span className="mx-2">·</span>
+          UX team:{" "}
+          <Link href="/admin" className="font-semibold text-vi-primary">
+            Admin
+          </Link>
+        </p>
+      </div>
+    </main>
   );
 }

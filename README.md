@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Groundwork — VI B2B research capture
 
-## Getting Started
+Internal platform for collecting BD/Sales answers to the **B2B Website
+Research & Opportunity Analysis** (Aug 2026), Sections 6 (S1–S12) and
+8 (Q1–Q20), merged into 20 questions across themes A–E.
 
-First, run the development server:
+## Surfaces
+
+| Route    | Who              | What                                                            |
+| -------- | ---------------- | --------------------------------------------------------------- |
+| `/`      | Respondents      | Welcome page → survey                                            |
+| `/survey`| BD/Sales (async) | One question per screen, autosave, skip, unsure flag, resume link |
+| `/live`  | Facilitator      | Non-linear console for the group session, speaker tags           |
+| `/admin` | UX team          | Passcode-gated: question CRUD, responses, synthesis, exports     |
+
+## Local development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+No environment setup needed locally — with no Supabase env vars the app uses a
+file store at `.data/db.json` (delete it to reset) and seeds the 20-question
+set automatically. The local admin passcode is `groundwork-dev`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Production (Vercel + Supabase)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Create a Supabase project → SQL editor → run `supabase/schema.sql`.
+2. On Vercel, set env vars:
+   - `SUPABASE_URL` — the project URL
+   - `SUPABASE_SERVICE_KEY` — the service role key (server-only; never exposed)
+   - `ADMIN_PASSCODE` — the UX team passcode
+3. Deploy. The question set seeds itself on the first request.
 
-## Learn More
+All database access is server-side with the service key; RLS is enabled with
+no public policies, so the anon key can access nothing.
 
-To learn more about Next.js, take a look at the following resources:
+## Data model
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`questions` (admin-editable; deleting a question with answers deactivates it
+instead) · `responses` (async respondents and live sessions; resumable via
+unguessable `resume_token`) · `answers` (one per response × question, with
+`is_unsure`, `is_skipped`, and live-mode `speaker`/`covered`).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Exports
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+From `/admin`: CSV (flat), XLSX (Responses / Answers / By-question sheets),
+and Markdown grouped by question for the synthesis doc.
