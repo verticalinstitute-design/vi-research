@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { S_ITEMS } from "@/lib/seed";
 import type { ResponseRow } from "@/lib/types";
 import type { AdminData } from "./page";
 
@@ -26,72 +25,15 @@ export default function SynthesisTab({ data }: { data: AdminData }) {
     ...questions.map((q) => answersFor(q.id).length)
   );
 
-  // S1–S12 tracker: a report item is answered when every mapped question has
-  // at least one substantive answer, partial when some do.
-  const tracker = S_ITEMS.map((s) => {
-    const mapped = questions.filter((q) => q.source_refs.includes(s.code));
-    const withAnswers = mapped.filter((q) => answersFor(q.id).length > 0);
-    const status: "answered" | "partial" | "open" =
-      mapped.length > 0 && withAnswers.length === mapped.length
-        ? "answered"
-        : withAnswers.length > 0
-          ? "partial"
-          : "open";
-    return { ...s, mapped, status };
-  });
-
   const selected = questions.find((q) => q.id === selectedId);
 
   return (
     <div className="space-y-6">
       {/* Stat tiles */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 gap-3">
         <Stat label="Responses started" value={data.responses.length} />
         <Stat label="Submitted" value={submitted.length} />
-        <Stat
-          label="Report items resolved"
-          value={`${tracker.filter((t) => t.status === "answered").length}/12`}
-        />
       </div>
-
-      {/* S1–S12 tracker */}
-      <section className="rounded-2xl border border-vi-border bg-white p-5">
-        <h3 className="font-heading text-base font-bold">
-          Report resolution tracker: Section 6 (S1–S12)
-        </h3>
-        <p className="mt-0.5 text-xs text-vi-muted">
-          An item resolves when every question mapped to it has at least one
-          answer.
-        </p>
-        <ul className="mt-3 grid gap-1.5 sm:grid-cols-2">
-          {tracker.map((t) => (
-            <li
-              key={t.code}
-              className="flex items-center gap-2.5 rounded-lg border border-vi-border px-3 py-2 text-sm"
-            >
-              <span
-                className={`size-2.5 shrink-0 rounded-full ${
-                  t.status === "answered"
-                    ? "bg-vi-green"
-                    : t.status === "partial"
-                      ? "bg-vi-amber"
-                      : "border border-vi-border bg-white"
-                }`}
-                title={t.status}
-              />
-              <span className="font-heading font-bold text-vi-primary">
-                {t.code}
-              </span>
-              <span className="truncate text-vi-muted" title={t.label}>
-                {t.label}
-              </span>
-              <span className="ml-auto shrink-0 text-xs text-vi-muted">
-                {t.mapped.map((q) => q.code).join(" ") || "unmapped"}
-              </span>
-            </li>
-          ))}
-        </ul>
-      </section>
 
       {/* Coverage chart */}
       <section className="rounded-2xl border border-vi-border bg-white p-5">

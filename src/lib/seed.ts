@@ -185,19 +185,3 @@ export const SEED_QUESTIONS: SeedQuestion[] = [
     source_refs: ["Q20"],
   },
 ];
-
-// Section 6 items of the report, used by the resolution tracker in /admin.
-export const S_ITEMS: { code: string; label: string }[] = [
-  { code: "S1", label: "Where corporate leads come from; the site's role in deals" },
-  { code: "S2", label: "The 10 most common prospect questions on calls" },
-  { code: "S3", label: "Top objections and current rebuttals" },
-  { code: "S4", label: "What actually closes deals" },
-  { code: "S5", label: "Most-requested and emerging training asks" },
-  { code: "S6", label: "Why clients choose VI; why prospects choose competitors" },
-  { code: "S7", label: "Strong case-study candidates with likely consent" },
-  { code: "S8", label: "Measurable results clients have reported back" },
-  { code: "S9", label: "Logo/testimonial permission status" },
-  { code: "S10", label: "What prospects couldn't find on the site" },
-  { code: "S11", label: "Typical deal profile" },
-  { code: "S12", label: "True facts for GovTech and CDL engagements" },
-];
