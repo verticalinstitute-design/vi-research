@@ -54,6 +54,11 @@ h4 {
   outline-offset: 2px;
 }
 
+::selection {
+  background: var(--color-vi-primary);
+  color: #ffffff;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
