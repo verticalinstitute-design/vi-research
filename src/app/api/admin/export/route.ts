@@ -34,7 +34,6 @@ function flatRows(
         Prompt: q.prompt,
         Sources: q.source_refs.join(" "),
         Answer: a?.body ?? "",
-        Unsure: a?.is_unsure ? "yes" : "",
         Skipped: a?.is_skipped ? "yes" : "",
         Speaker: a?.speaker ?? "",
       });
@@ -59,7 +58,7 @@ function toMarkdown(
   answers: Answer[]
 ): string {
   const lines: string[] = [
-    "# Groundwork — B2B research answers",
+    "# VI Research Platform — B2B research answers",
     "",
     `Exported ${new Date().toISOString().slice(0, 10)} · ${responses.length} responses`,
     "",
@@ -77,18 +76,13 @@ function toMarkdown(
       const a = answers.find(
         (x) => x.response_id === r.id && x.question_id === q.id
       );
-      if (!a || (!a.body.trim() && !a.is_unsure)) continue;
+      if (!a || !a.body.trim()) continue;
       any = true;
-      const flags = [
-        a.is_unsure ? "⚠ unsure — needs checking" : "",
-        a.speaker ? `speaker: ${a.speaker}` : "",
-      ]
-        .filter(Boolean)
-        .join(" · ");
+      const flags = a.speaker ? `speaker: ${a.speaker}` : "";
       lines.push(
         `**${respondentLabel(r)}**${flags ? ` _(${flags})_` : ""}`,
         "",
-        a.body.trim() ? a.body.trim() : "_(flagged unsure, no text)_",
+        a.body.trim(),
         ""
       );
     }
@@ -113,7 +107,7 @@ export async function GET(req: NextRequest) {
     return new NextResponse(toMarkdown(questions, responses, answers), {
       headers: {
         "Content-Type": "text/markdown; charset=utf-8",
-        "Content-Disposition": `attachment; filename="groundwork-answers-${date}.md"`,
+        "Content-Disposition": `attachment; filename="vi-research-answers-${date}.md"`,
       },
     });
   }
@@ -167,7 +161,7 @@ export async function GET(req: NextRequest) {
       headers: {
         "Content-Type":
           "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        "Content-Disposition": `attachment; filename="groundwork-answers-${date}.xlsx"`,
+        "Content-Disposition": `attachment; filename="vi-research-answers-${date}.xlsx"`,
       },
     });
   }
@@ -175,7 +169,7 @@ export async function GET(req: NextRequest) {
   return new NextResponse(toCsv(flatRows(questions, responses, answers)), {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": `attachment; filename="groundwork-answers-${date}.csv"`,
+      "Content-Disposition": `attachment; filename="vi-research-answers-${date}.csv"`,
     },
   });
 }

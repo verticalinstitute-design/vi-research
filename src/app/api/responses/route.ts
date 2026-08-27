@@ -6,9 +6,10 @@ export async function POST(req: NextRequest) {
   const mode = body.mode === "live" ? "live" : "async";
   const name = String(body.name ?? "").trim();
   const role = String(body.role ?? "").trim();
-  if (!name || !role) {
+  const email = String(body.email ?? "").trim();
+  if (!name || !role || (mode === "async" && !email)) {
     return NextResponse.json(
-      { error: "Name and role are required." },
+      { error: "Name, role, and email are required." },
       { status: 400 }
     );
   }
@@ -17,7 +18,7 @@ export async function POST(req: NextRequest) {
     name,
     role,
     team: String(body.team ?? "").trim(),
-    email: String(body.email ?? "").trim(),
+    email,
     session_name: body.session_name ? String(body.session_name) : undefined,
     session_date: body.session_date ? String(body.session_date) : undefined,
     attendees: Array.isArray(body.attendees)

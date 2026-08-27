@@ -64,12 +64,18 @@ export default function AdminPage() {
       <header className="border-b border-vi-border bg-white">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-4">
           <div>
-            <p className="eyebrow text-vi-primary">Groundwork · Admin</p>
+            <p className="eyebrow text-vi-primary">VI Research Platform · Admin</p>
             <h1 className="font-heading text-xl font-bold">
               B2B research console
             </h1>
           </div>
           <div className="flex flex-wrap items-center gap-2">
+            <Link
+              href="/live"
+              className="mr-2 rounded-[var(--radius-btn)] border-[1.5px] border-vi-border bg-white px-3.5 py-1.5 text-sm font-semibold transition hover:border-vi-primary"
+            >
+              Facilitator console
+            </Link>
             <span className="mr-1 text-xs font-semibold text-vi-muted">
               Export
             </span>
@@ -154,7 +160,7 @@ function Login({ onSuccess }: { onSuccess: () => void }) {
         onSubmit={submit}
         className="w-full max-w-sm rounded-2xl bg-white p-7 shadow-[var(--shadow-card)]"
       >
-        <p className="eyebrow text-vi-primary">Groundwork · Admin</p>
+        <p className="eyebrow text-vi-primary">VI Research Platform · Admin</p>
         <h1 className="mt-2 text-2xl">UX team access</h1>
         <input
           type="password"

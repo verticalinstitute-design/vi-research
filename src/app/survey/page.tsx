@@ -21,7 +21,7 @@ const TOKEN_KEY = "gw_token";
 
 type Phase = "loading" | "identity" | "question" | "review" | "done";
 
-type Draft = { body: string; is_unsure: boolean; is_skipped: boolean };
+type Draft = { body: string; is_skipped: boolean };
 
 function SurveyInner() {
   const params = useSearchParams();
@@ -59,7 +59,6 @@ function SurveyInner() {
               for (const a of data.answers) {
                 map[a.question_id] = {
                   body: a.body,
-                  is_unsure: a.is_unsure,
                   is_skipped: a.is_skipped,
                 };
               }
@@ -70,7 +69,7 @@ function SurveyInner() {
               }
               const firstUnanswered = questions.findIndex((q) => {
                 const d = map[q.id];
-                return !d || (!d.body.trim() && !d.is_skipped && !d.is_unsure);
+                return !d || (!d.body.trim() && !d.is_skipped);
               });
               setIndex(firstUnanswered === -1 ? 0 : firstUnanswered);
               setPhase("question");
@@ -92,7 +91,6 @@ function SurveyInner() {
   const question = questions[index];
   const draft: Draft = (question && drafts[question.id]) || {
     body: "",
-    is_unsure: false,
     is_skipped: false,
   };
 
@@ -222,8 +220,7 @@ function SurveyInner() {
           </h1>
           <p className="mt-4 text-white/80">
             Your answers feed directly into the corporate hub revamp, the new
-            case-study strategy, and the enquiry form Sales asked for. The UX
-            team will follow up on anything you flagged as unsure.
+            case-study strategy, and the enquiry form Sales asked for.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <button
@@ -253,8 +250,7 @@ function SurveyInner() {
             {answered} of {questions.length} answered
           </h1>
           <p className="mt-1.5 text-sm text-vi-muted">
-            Tap any question to edit. Skipped and unsure items are flagged —
-            both are fine to submit.
+            Tap any question to edit. Skipped questions are fine to submit.
           </p>
         </header>
         <ul className="mx-auto w-full max-w-2xl flex-1 space-y-2 overflow-y-auto px-6 pb-4 [mask-image:linear-gradient(to_bottom,transparent,black_12px,black_calc(100%-12px),transparent)] [scrollbar-color:var(--color-vi-ice-deep)_transparent]">
@@ -271,12 +267,11 @@ function SurveyInner() {
                       {q.code}
                     </span>
                     <span className="flex gap-1.5">
-                      {d?.is_unsure && <Badge tone="amber">Unsure</Badge>}
                       {!d?.body.trim() && d?.is_skipped && (
-                        <Badge tone="grey">Skipped</Badge>
+                        <Badge>Skipped</Badge>
                       )}
-                      {!d?.body.trim() && !d?.is_skipped && !d?.is_unsure && (
-                        <Badge tone="grey">No answer</Badge>
+                      {!d?.body.trim() && !d?.is_skipped && (
+                        <Badge>No answer</Badge>
                       )}
                     </span>
                   </div>
@@ -359,38 +354,19 @@ function SurveyInner() {
             className="mt-6 w-full resize-none rounded-2xl border border-transparent bg-white p-5 text-left text-[15.5px] leading-relaxed caret-vi-primary shadow-[0_16px_40px_rgba(20,30,77,0.10)] transition placeholder:text-vi-muted/70 focus:border-vi-primary focus:outline-none sm:mt-8"
           />
 
-          <div className="mt-4 flex w-full flex-wrap items-center justify-between gap-3">
+          <div className="mt-4 flex w-full items-center justify-between gap-3">
             <button
-              onClick={() => updateDraft({ is_unsure: !draft.is_unsure })}
-              aria-pressed={draft.is_unsure}
-              className={`flex items-center gap-2 rounded-full border px-4 py-2 text-[13px] font-semibold transition ${
-                draft.is_unsure
-                  ? "border-vi-amber bg-white text-vi-text"
-                  : "border-vi-border bg-white/60 text-vi-muted hover:border-vi-amber hover:text-vi-text"
-              }`}
+              onClick={skip}
+              className="text-[14px] font-semibold text-vi-muted transition hover:text-vi-text"
             >
-              <span
-                className={`size-2 rounded-full ${
-                  draft.is_unsure ? "bg-vi-amber" : "bg-vi-ice-deep"
-                }`}
-                aria-hidden
-              />
-              Needs checking
+              Skip
             </button>
-            <div className="flex items-center gap-5">
-              <button
-                onClick={skip}
-                className="text-[14px] font-semibold text-vi-muted transition hover:text-vi-text"
-              >
-                Skip
-              </button>
-              <button
-                onClick={next}
-                className="rounded-[var(--radius-btn)] bg-vi-primary px-7 py-3 text-[15px] font-semibold text-white shadow-[var(--shadow-glow)] transition hover:bg-vi-primary-dark"
-              >
-                {index + 1 === questions.length ? "Review answers" : "Next →"}
-              </button>
-            </div>
+            <button
+              onClick={next}
+              className="rounded-[var(--radius-btn)] bg-vi-primary px-7 py-3 text-[15px] font-semibold text-white shadow-[var(--shadow-glow)] transition hover:bg-vi-primary-dark"
+            >
+              {index + 1 === questions.length ? "Review answers" : "Next →"}
+            </button>
           </div>
         </div>
       </section>
@@ -458,7 +434,7 @@ function IdentityScreen({ onCreated }: { onCreated: (r: ResponseRow) => void }) 
           <h1 className="text-3xl">Who&apos;s answering?</h1>
           <p className="mx-auto mt-2 max-w-[42ch] text-sm text-vi-muted">
             So the UX team can follow up on your answers — especially the ones
-            that point to specific clients or need checking.
+            that point to specific clients.
           </p>
         </div>
         <form onSubmit={start} className="mt-7 space-y-4">
@@ -499,12 +475,13 @@ function IdentityScreen({ onCreated }: { onCreated: (r: ResponseRow) => void }) 
               ))}
             </div>
           </Field>
-          <Field label="Email (optional)">
+          <Field label="Email" required>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="For follow-ups only"
+              required
+              placeholder="you@verticalinstitute.com"
               className="w-full rounded-xl border border-transparent bg-white p-3 shadow-[0_4px_14px_rgba(20,30,77,0.06)] transition placeholder:text-vi-muted/70 focus:border-vi-primary focus:outline-none"
             />
           </Field>
@@ -516,7 +493,7 @@ function IdentityScreen({ onCreated }: { onCreated: (r: ResponseRow) => void }) 
             disabled={busy}
             className="w-full rounded-[var(--radius-btn)] bg-vi-primary px-7 py-3 font-semibold text-white shadow-[var(--shadow-glow)] transition hover:bg-vi-primary-dark disabled:opacity-60"
           >
-            {busy ? "Starting…" : "Begin — 20 questions"}
+            {busy ? "Starting…" : "Begin"}
           </button>
         </form>
       </div>
@@ -553,21 +530,9 @@ function Field({
   );
 }
 
-function Badge({
-  tone,
-  children,
-}: {
-  tone: "amber" | "grey";
-  children: React.ReactNode;
-}) {
+function Badge({ children }: { children: React.ReactNode }) {
   return (
-    <span
-      className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide ${
-        tone === "amber"
-          ? "bg-vi-amber text-white"
-          : "bg-vi-ice-deep text-vi-muted"
-      }`}
-    >
+    <span className="rounded-full bg-vi-ice-deep px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wide text-vi-muted">
       {children}
     </span>
   );

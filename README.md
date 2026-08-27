@@ -1,17 +1,17 @@
-# Groundwork — VI B2B research capture
+# VI Research Platform — B2B research capture
 
 Internal platform for collecting BD/Sales answers to the **B2B Website
 Research & Opportunity Analysis** (Aug 2026), Sections 6 (S1–S12) and
-8 (Q1–Q20), merged into 20 questions across themes A–E.
+8 (Q1–Q20), merged into 20+ questions across themes A–E (admin-editable).
 
 ## Surfaces
 
-| Route    | Who              | What                                                            |
-| -------- | ---------------- | --------------------------------------------------------------- |
-| `/`      | Respondents      | Welcome page → survey                                            |
-| `/survey`| BD/Sales (async) | One question per screen, autosave, skip, unsure flag, resume link |
-| `/live`  | Facilitator      | Non-linear console for the group session, speaker tags           |
-| `/admin` | UX team          | Passcode-gated: question CRUD, responses, synthesis, exports     |
+| Route    | Who              | What                                                        |
+| -------- | ---------------- | ------------------------------------------------------------ |
+| `/`      | Respondents      | Welcome page → survey                                        |
+| `/survey`| BD/Sales (async) | One question per screen, autosave, skip, resume link         |
+| `/live`  | Facilitator      | Non-linear console for the group session, speaker tags       |
+| `/admin` | UX team          | Passcode-gated: question CRUD, responses, synthesis, exports, facilitator console link |
 
 ## Local development
 
@@ -21,8 +21,8 @@ npm run dev
 ```
 
 No environment setup needed locally — with no Supabase env vars the app uses a
-file store at `.data/db.json` (delete it to reset) and seeds the 20-question
-set automatically. The local admin passcode is `groundwork-dev`.
+file store at `.data/db.json` (delete it to reset) and seeds the question set
+automatically. The local admin passcode is `vi-research-dev`.
 
 ## Production (Vercel + Supabase)
 
@@ -41,7 +41,7 @@ no public policies, so the anon key can access nothing.
 `questions` (admin-editable; deleting a question with answers deactivates it
 instead) · `responses` (async respondents and live sessions; resumable via
 unguessable `resume_token`) · `answers` (one per response × question, with
-`is_unsure`, `is_skipped`, and live-mode `speaker`/`covered`).
+`is_skipped`, and live-mode `speaker`/`covered`).
 
 ## Exports
 

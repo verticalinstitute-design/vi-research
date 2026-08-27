@@ -82,8 +82,7 @@ export default function ResponsesTab({ data }: { data: AdminData }) {
                     const a = data.answers.find(
                       (x) => x.response_id === r.id && x.question_id === q.id
                     );
-                    if (!a || (!a.body.trim() && !a.is_unsure && !a.is_skipped))
-                      return null;
+                    if (!a || (!a.body.trim() && !a.is_skipped)) return null;
                     return (
                       <div key={q.id}>
                         <dt className="flex flex-wrap items-center gap-2 text-sm font-semibold">
@@ -91,11 +90,6 @@ export default function ResponsesTab({ data }: { data: AdminData }) {
                             {q.code}
                           </span>
                           {q.prompt}
-                          {a.is_unsure && (
-                            <span className="rounded-full bg-vi-amber px-2 py-0.5 text-[10px] font-bold uppercase text-white">
-                              Unsure
-                            </span>
-                          )}
                           {a.is_skipped && !a.body.trim() && (
                             <span className="rounded-full bg-vi-ice-deep px-2 py-0.5 text-[10px] font-bold uppercase text-vi-muted">
                               Skipped

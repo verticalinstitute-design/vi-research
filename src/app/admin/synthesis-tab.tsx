@@ -18,12 +18,9 @@ export default function SynthesisTab({ data }: { data: AdminData }) {
   const [selectedId, setSelectedId] = useState<string>(questions[0]?.id ?? "");
 
   const answersFor = (qid: string) =>
-    data.answers.filter(
-      (a) => a.question_id === qid && (a.body.trim() || a.is_unsure)
-    );
+    data.answers.filter((a) => a.question_id === qid && a.body.trim());
 
   const submitted = data.responses.filter((r) => r.status === "submitted");
-  const unsureAnswers = data.answers.filter((a) => a.is_unsure);
   const maxCoverage = Math.max(
     1,
     ...questions.map((q) => answersFor(q.id).length)
@@ -33,9 +30,7 @@ export default function SynthesisTab({ data }: { data: AdminData }) {
   // at least one substantive answer, partial when some do.
   const tracker = S_ITEMS.map((s) => {
     const mapped = questions.filter((q) => q.source_refs.includes(s.code));
-    const withAnswers = mapped.filter((q) =>
-      answersFor(q.id).some((a) => a.body.trim())
-    );
+    const withAnswers = mapped.filter((q) => answersFor(q.id).length > 0);
     const status: "answered" | "partial" | "open" =
       mapped.length > 0 && withAnswers.length === mapped.length
         ? "answered"
@@ -50,14 +45,13 @@ export default function SynthesisTab({ data }: { data: AdminData }) {
   return (
     <div className="space-y-6">
       {/* Stat tiles */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <div className="grid grid-cols-3 gap-3">
         <Stat label="Responses started" value={data.responses.length} />
         <Stat label="Submitted" value={submitted.length} />
         <Stat
           label="Report items resolved"
           value={`${tracker.filter((t) => t.status === "answered").length}/12`}
         />
-        <Stat label="Unsure flags" value={unsureAnswers.length} tone="amber" />
       </div>
 
       {/* S1–S12 tracker */}
@@ -107,7 +101,6 @@ export default function SynthesisTab({ data }: { data: AdminData }) {
         <ul className="mt-3 space-y-1.5">
           {questions.map((q) => {
             const n = answersFor(q.id).length;
-            const unsure = answersFor(q.id).filter((a) => a.is_unsure).length;
             return (
               <li key={q.id} className="flex items-center gap-3 text-sm">
                 <button
@@ -123,7 +116,7 @@ export default function SynthesisTab({ data }: { data: AdminData }) {
                   />
                 </div>
                 <span className="w-16 shrink-0 text-right text-xs tabular-nums text-vi-muted">
-                  {n} ans{unsure ? ` · ${unsure}⚠` : ""}
+                  {n} ans
                 </span>
               </li>
             );
@@ -176,18 +169,9 @@ export default function SynthesisTab({ data }: { data: AdminData }) {
                           speaker: {a.speaker}
                         </span>
                       )}
-                      {a.is_unsure && (
-                        <span className="rounded-full bg-vi-amber px-2 py-0.5 text-[10px] font-bold uppercase text-white">
-                          Unsure — verify
-                        </span>
-                      )}
                     </p>
                     <p className="mt-2 whitespace-pre-wrap text-sm">
-                      {a.body.trim() || (
-                        <em className="text-vi-muted">
-                          Flagged unsure without an answer.
-                        </em>
-                      )}
+                      {a.body}
                     </p>
                   </div>
                 );
@@ -196,62 +180,14 @@ export default function SynthesisTab({ data }: { data: AdminData }) {
           </div>
         )}
       </section>
-
-      {/* Follow-up queue */}
-      <section className="rounded-2xl border border-vi-border bg-white p-5">
-        <h3 className="font-heading text-base font-bold">
-          Follow-up queue — flagged unsure
-        </h3>
-        {unsureAnswers.length === 0 ? (
-          <p className="mt-2 text-sm text-vi-muted">Nothing flagged yet.</p>
-        ) : (
-          <ul className="mt-3 space-y-2">
-            {unsureAnswers.map((a) => {
-              const q = data.questions.find((x) => x.id === a.question_id);
-              const r = data.responses.find((x) => x.id === a.response_id);
-              if (!q || !r) return null;
-              return (
-                <li
-                  key={a.id}
-                  className="flex flex-wrap items-center gap-2 rounded-lg border-l-[3px] border-vi-amber bg-amber-50/60 px-3.5 py-2.5 text-sm"
-                >
-                  <span className="font-heading font-bold text-vi-primary">
-                    {q.code}
-                  </span>
-                  <span className="font-semibold">{r.name}</span>
-                  <span className="text-vi-muted">
-                    {a.body.trim()
-                      ? a.body.length > 120
-                        ? `${a.body.slice(0, 120)}…`
-                        : a.body
-                      : "needs checking — no answer given"}
-                  </span>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
     </div>
   );
 }
 
-function Stat({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: string | number;
-  tone?: "amber";
-}) {
+function Stat({ label, value }: { label: string; value: string | number }) {
   return (
     <div className="rounded-2xl border border-vi-border bg-white p-4">
-      <p
-        className={`font-heading text-2xl font-bold tabular-nums ${
-          tone === "amber" ? "text-vi-amber" : "text-vi-text"
-        }`}
-      >
+      <p className="font-heading text-2xl font-bold tabular-nums text-vi-text">
         {value}
       </p>
       <p className="mt-0.5 text-xs font-semibold uppercase tracking-wide text-vi-muted">

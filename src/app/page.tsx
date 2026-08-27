@@ -1,11 +1,11 @@
 import Link from "next/link";
 
 const THEMES = [
-  { code: "A", label: "The buyer & the journey", count: 4 },
-  { code: "B", label: "Objections & competition", count: 4 },
-  { code: "C", label: "Offer & demand", count: 4 },
-  { code: "D", label: "Proof & assets", count: 5 },
-  { code: "E", label: "Enablement & forward", count: 3 },
+  "The buyer & the journey",
+  "Objections & competition",
+  "Offer & demand",
+  "Proof & assets",
+  "Enablement & forward",
 ];
 
 export default function Home() {
@@ -20,38 +20,31 @@ export default function Home() {
           your deals.
         </h1>
         <p className="mt-5 max-w-xl text-lg text-vi-muted">
-          20 questions about your corporate deals — buyers, objections, proof,
-          and what would help you sell. Your answers feed directly into the B2B
+          About your corporate deals — buyers, objections, proof, and what
+          would help you sell. Your answers feed directly into the B2B
           website revamp.
         </p>
 
         <div className="mt-8 rounded-2xl border border-vi-border bg-white p-6 shadow-[var(--shadow-card)]">
           <div className="flex flex-wrap gap-2">
-            {THEMES.map((t) => (
+            {THEMES.map((label) => (
               <span
-                key={t.code}
+                key={label}
                 className="rounded-full border border-vi-border bg-vi-ice px-3 py-1 text-xs font-semibold text-vi-text"
               >
-                {t.code} · {t.label}
-                <span className="ml-1.5 text-vi-muted">{t.count}</span>
+                {label}
               </span>
             ))}
           </div>
           <ul className="mt-5 space-y-2 text-sm text-vi-muted">
             <li className="flex gap-2">
               <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-vi-green" />
-              One question at a time — takes 15–20 minutes, honest and rough
-              beats polished.
+              One question at a time — honest and rough beats polished.
             </li>
             <li className="flex gap-2">
               <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-vi-green" />
               Everything autosaves. Stop anytime and continue later from any
               device.
-            </li>
-            <li className="flex gap-2">
-              <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-vi-green" />
-              Not sure about something? Flag it — knowing what needs checking
-              helps too.
             </li>
           </ul>
           <Link
@@ -63,11 +56,6 @@ export default function Home() {
         </div>
 
         <p className="mt-8 text-xs text-vi-muted">
-          Running the group session?{" "}
-          <Link href="/live" className="font-semibold text-vi-primary">
-            Open the facilitator console
-          </Link>
-          <span className="mx-2">·</span>
           UX team:{" "}
           <Link href="/admin" className="font-semibold text-vi-primary">
             Admin

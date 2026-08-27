@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 const COOKIE = "gw_admin";
 
 function passcode(): string {
-  return process.env.ADMIN_PASSCODE || "groundwork-dev";
+  return process.env.ADMIN_PASSCODE || "vi-research-dev";
 }
 
 export function tokenFor(code: string): string {

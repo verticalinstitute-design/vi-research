@@ -15,7 +15,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Groundwork · Vertical Institute",
+  title: "VI Research Platform · Vertical Institute",
   description:
     "Internal research capture for the B2B website optimisation project.",
 };

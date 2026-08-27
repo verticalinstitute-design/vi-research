@@ -32,8 +32,7 @@ export default function QuestionsTab({
     (a, b) => a.sort_order - b.sort_order
   );
   const answerCount = (qid: string) =>
-    data.answers.filter((a) => a.question_id === qid && (a.body.trim() || a.is_unsure))
-      .length;
+    data.answers.filter((a) => a.question_id === qid && a.body.trim()).length;
 
   const startEdit = (q: Question) => {
     setAdding(false);

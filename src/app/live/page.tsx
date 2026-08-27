@@ -15,7 +15,6 @@ const TOKEN_KEY = "gw_live_token";
 
 type Draft = {
   body: string;
-  is_unsure: boolean;
   covered: boolean;
   is_skipped: boolean;
   speaker: string;
@@ -23,7 +22,6 @@ type Draft = {
 
 const EMPTY: Draft = {
   body: "",
-  is_unsure: false,
   covered: false,
   is_skipped: false,
   speaker: "",
@@ -54,7 +52,6 @@ export default function LivePage() {
             for (const a of data.answers) {
               map[a.question_id] = {
                 body: a.body,
-                is_unsure: a.is_unsure,
                 covered: a.covered,
                 is_skipped: a.is_skipped,
                 speaker: a.speaker ?? "",
@@ -84,7 +81,6 @@ export default function LivePage() {
       if (latest && token) {
         saveAnswer(token, qid, {
           body: latest.body,
-          is_unsure: latest.is_unsure,
           covered: latest.covered,
           is_skipped: latest.is_skipped,
           speaker: latest.speaker || null,
@@ -227,11 +223,6 @@ export default function LivePage() {
                           <span className="line-clamp-2 text-vi-muted">
                             {q.prompt}
                           </span>
-                          {d?.is_unsure && (
-                            <span className="ml-auto shrink-0 text-vi-amber" title="Flagged unsure">
-                              ⚠
-                            </span>
-                          )}
                         </button>
                       </li>
                     );
@@ -278,13 +269,6 @@ export default function LivePage() {
                 </datalist>
               </label>
 
-              <Toggle
-                on={draft.is_unsure}
-                onClick={() => update(active.id, { is_unsure: !draft.is_unsure })}
-                activeClass="border-vi-amber bg-amber-50"
-              >
-                ⚠ Needs checking
-              </Toggle>
               <Toggle
                 on={draft.covered}
                 onClick={() => update(active.id, { covered: !draft.covered })}
