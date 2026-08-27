@@ -86,9 +86,6 @@ export default function ResponsesTab({ data }: { data: AdminData }) {
                     return (
                       <div key={q.id}>
                         <dt className="flex flex-wrap items-center gap-2 text-sm font-semibold">
-                          <span className="font-heading text-vi-primary">
-                            {q.code}
-                          </span>
                           {q.prompt}
                           {a.is_skipped && !a.body.trim() && (
                             <span className="rounded-full bg-vi-ice-deep px-2 py-0.5 text-[10px] font-bold uppercase text-vi-muted">

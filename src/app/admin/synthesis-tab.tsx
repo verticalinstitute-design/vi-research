@@ -47,9 +47,10 @@ export default function SynthesisTab({ data }: { data: AdminData }) {
               <li key={q.id} className="flex items-center gap-3 text-sm">
                 <button
                   onClick={() => setSelectedId(q.id)}
-                  className="w-9 shrink-0 text-left font-heading font-bold text-vi-primary hover:underline"
+                  title={q.prompt}
+                  className="w-44 shrink-0 truncate text-left font-semibold text-vi-primary hover:underline"
                 >
-                  {q.code}
+                  {q.prompt}
                 </button>
                 <div className="h-4 flex-1 overflow-hidden rounded bg-vi-ice">
                   <div
@@ -76,7 +77,7 @@ export default function SynthesisTab({ data }: { data: AdminData }) {
         >
           {questions.map((q) => (
             <option key={q.id} value={q.id}>
-              {q.code} · {q.prompt}
+              {q.prompt}
             </option>
           ))}
         </select>

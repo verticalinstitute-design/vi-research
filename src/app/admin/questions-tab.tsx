@@ -6,14 +6,18 @@ import { api } from "@/lib/client";
 import type { AdminData } from "./page";
 
 type Form = {
-  code: string;
   theme: string;
   prompt: string;
   helper: string;
   sources: string;
 };
 
-const EMPTY_FORM: Form = { code: "", theme: "", prompt: "", helper: "", sources: "" };
+const EMPTY_FORM: Form = { theme: "", prompt: "", helper: "", sources: "" };
+
+/** Short label for confirms/aria — questions no longer carry a stable code. */
+function shortLabel(prompt: string): string {
+  return prompt.length > 40 ? `${prompt.slice(0, 40)}…` : prompt;
+}
 
 export default function QuestionsTab({
   data,
@@ -77,7 +81,6 @@ export default function QuestionsTab({
     setAdding(false);
     setEditingId(q.id);
     setForm({
-      code: q.code,
       theme: q.theme,
       prompt: q.prompt,
       helper: q.helper,
@@ -88,7 +91,6 @@ export default function QuestionsTab({
   const save = async () => {
     setBusy(true);
     const payload = {
-      code: form.code.trim(),
       theme: form.theme.trim(),
       prompt: form.prompt.trim(),
       helper: form.helper.trim(),
@@ -130,9 +132,10 @@ export default function QuestionsTab({
 
   const remove = async (q: Question) => {
     const n = answerCount(q.id);
+    const label = shortLabel(q.prompt);
     const msg = n
-      ? `"${q.code}" has ${n} answer(s), so it will be deactivated (hidden from new responses) instead of deleted. Continue?`
-      : `Delete "${q.code}" permanently?`;
+      ? `"${label}" has ${n} answer(s), so it will be deactivated (hidden from new responses) instead of deleted. Continue?`
+      : `Delete "${label}" permanently?`;
     if (!confirm(msg)) return;
     const result = await api<{ deleted: boolean; deactivated: boolean }>(
       `/api/admin/questions/${q.id}`,
@@ -140,8 +143,8 @@ export default function QuestionsTab({
     );
     setNotice(
       result.deleted
-        ? `${q.code} deleted.`
-        : `${q.code} deactivated. Its existing answers are preserved.`
+        ? `"${label}" deleted.`
+        : `"${label}" deactivated. Its existing answers are preserved.`
     );
     await reload();
   };
@@ -185,26 +188,18 @@ export default function QuestionsTab({
           <h3 className="font-heading text-base font-bold">
             {editingId ? "Edit question" : "New question"}
           </h3>
-          <div className="mt-3 grid gap-3 sm:grid-cols-[100px_1fr]">
-            <input
-              value={form.code}
-              onChange={(e) => setForm({ ...form, code: e.target.value })}
-              placeholder="Code"
-              className="rounded-lg border border-vi-border px-3 py-2 text-sm"
-            />
-            <input
-              value={form.theme}
-              onChange={(e) => setForm({ ...form, theme: e.target.value })}
-              placeholder="Theme, e.g. A · The buyer & the journey"
-              list="themes"
-              className="rounded-lg border border-vi-border px-3 py-2 text-sm"
-            />
-            <datalist id="themes">
-              {[...new Set(questions.map((q) => q.theme))].map((t) => (
-                <option key={t} value={t} />
-              ))}
-            </datalist>
-          </div>
+          <input
+            value={form.theme}
+            onChange={(e) => setForm({ ...form, theme: e.target.value })}
+            placeholder="Theme, e.g. The buyer & the journey"
+            list="themes"
+            className="mt-3 w-full rounded-lg border border-vi-border px-3 py-2 text-sm"
+          />
+          <datalist id="themes">
+            {[...new Set(questions.map((q) => q.theme))].map((t) => (
+              <option key={t} value={t} />
+            ))}
+          </datalist>
           <textarea
             value={form.prompt}
             onChange={(e) => setForm({ ...form, prompt: e.target.value })}
@@ -290,7 +285,7 @@ export default function QuestionsTab({
                   <button
                     onClick={() => moveBy(q, -1)}
                     disabled={i === 0}
-                    aria-label={`Move ${q.code} up`}
+                    aria-label={`Move "${shortLabel(q.prompt)}" up`}
                     className="rounded px-1 text-[10px] text-vi-muted hover:text-vi-primary disabled:opacity-30"
                   >
                     ▲
@@ -298,7 +293,7 @@ export default function QuestionsTab({
                   <button
                     onClick={() => moveBy(q, 1)}
                     disabled={i === questions.length - 1}
-                    aria-label={`Move ${q.code} down`}
+                    aria-label={`Move "${shortLabel(q.prompt)}" down`}
                     className="rounded px-1 text-[10px] text-vi-muted hover:text-vi-primary disabled:opacity-30"
                   >
                     ▼
@@ -307,10 +302,9 @@ export default function QuestionsTab({
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-heading font-bold text-vi-primary">
-                    {q.code}
+                  <span className="text-xs font-semibold text-vi-muted">
+                    {q.theme}
                   </span>
-                  <span className="text-xs text-vi-muted">{q.theme}</span>
                   {!q.is_active && (
                     <span className="rounded-full bg-vi-ice-deep px-2 py-0.5 text-[11px] font-bold uppercase text-vi-muted">
                       Inactive
@@ -320,7 +314,9 @@ export default function QuestionsTab({
                     {answerCount(q.id)} answers
                   </span>
                 </div>
-                <p className="mt-1 text-sm font-medium">{q.prompt}</p>
+                <p className="mt-1 text-[15px] font-semibold text-vi-text">
+                  {q.prompt}
+                </p>
                 {q.helper && (
                   <p className="mt-0.5 text-xs text-vi-muted">{q.helper}</p>
                 )}
