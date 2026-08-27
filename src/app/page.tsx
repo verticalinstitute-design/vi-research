@@ -20,7 +20,7 @@ export default function Home() {
           your deals.
         </h1>
         <p className="mt-5 max-w-xl text-lg text-vi-muted">
-          About your corporate deals — buyers, objections, proof, and what
+          About your corporate deals: buyers, objections, proof, and what
           would help you sell. Your answers feed directly into the B2B
           website revamp.
         </p>
@@ -39,7 +39,7 @@ export default function Home() {
           <ul className="mt-5 space-y-2 text-sm text-vi-muted">
             <li className="flex gap-2">
               <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-vi-green" />
-              One question at a time — honest and rough beats polished.
+              One question at a time. Honest and rough beats polished.
             </li>
             <li className="flex gap-2">
               <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-vi-green" />

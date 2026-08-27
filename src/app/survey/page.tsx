@@ -103,7 +103,7 @@ function SurveyInner() {
       const latest = draftsRef.current[qid];
       if (latest) {
         saveAnswer(token, qid, latest).catch(() =>
-          showToast("Couldn't save — check your connection")
+          showToast("Couldn't save. Check your connection.")
         );
       }
     });
@@ -149,7 +149,7 @@ function SurveyInner() {
     const url = `${location.origin}/survey?r=${token}`;
     try {
       await navigator.clipboard.writeText(url);
-      showToast("Resume link copied — open it on any device to continue");
+      showToast("Resume link copied. Open it on any device to continue.");
     } catch {
       prompt("Copy this link to continue later:", url);
     }
@@ -163,7 +163,7 @@ function SurveyInner() {
       });
       setPhase("done");
     } catch (e) {
-      showToast(e instanceof Error ? e.message : "Submit failed — try again");
+      showToast(e instanceof Error ? e.message : "Submit failed. Try again.");
     }
   };
 
@@ -348,19 +348,28 @@ function SurveyInner() {
             value={draft.body}
             onChange={(e) => updateDraft({ body: e.target.value })}
             onBlur={() => flush(question.id)}
-            placeholder="Type your answer — rough notes are perfect…"
+            placeholder="Type your answer, rough notes are perfect…"
             rows={6}
             autoFocus
             className="mt-6 w-full resize-none rounded-2xl border border-transparent bg-white p-5 text-left text-[15.5px] leading-relaxed caret-vi-primary shadow-[0_16px_40px_rgba(20,30,77,0.10)] transition placeholder:text-vi-muted/70 focus:border-vi-primary focus:outline-none sm:mt-8"
           />
 
           <div className="mt-4 flex w-full items-center justify-between gap-3">
-            <button
-              onClick={skip}
-              className="text-[14px] font-semibold text-vi-muted transition hover:text-vi-text"
-            >
-              Skip
-            </button>
+            <div className="flex items-center gap-5">
+              <button
+                onClick={() => (index === 0 ? undefined : goTo(index - 1))}
+                disabled={index === 0}
+                className="text-[14px] font-semibold text-vi-muted transition hover:text-vi-text disabled:opacity-40"
+              >
+                ← Back
+              </button>
+              <button
+                onClick={skip}
+                className="text-[14px] font-semibold text-vi-muted transition hover:text-vi-text"
+              >
+                Skip
+              </button>
+            </div>
             <button
               onClick={next}
               className="rounded-[var(--radius-btn)] bg-vi-primary px-7 py-3 text-[15px] font-semibold text-white shadow-[var(--shadow-glow)] transition hover:bg-vi-primary-dark"
@@ -371,15 +380,8 @@ function SurveyInner() {
         </div>
       </section>
 
-      <footer className="flex items-center justify-between px-5 pb-5 text-[12px] text-vi-muted sm:px-8 sm:pb-6">
-        <button
-          onClick={() => (index === 0 ? undefined : goTo(index - 1))}
-          disabled={index === 0}
-          className="font-semibold transition hover:text-vi-text disabled:opacity-40"
-        >
-          ← Back
-        </button>
-        <p className="hidden sm:block">
+      <footer className="flex items-center justify-center px-5 pb-5 text-[12px] text-vi-muted sm:px-8 sm:pb-6">
+        <p>
           Autosaves as you type ·{" "}
           <button
             onClick={copyResumeLink}
@@ -388,12 +390,6 @@ function SurveyInner() {
             Continue later
           </button>
         </p>
-        <button
-          onClick={copyResumeLink}
-          className="font-semibold text-vi-primary sm:hidden"
-        >
-          Continue later
-        </button>
       </footer>
       {toast && <Toast msg={toast} />}
     </main>
@@ -433,7 +429,7 @@ function IdentityScreen({ onCreated }: { onCreated: (r: ResponseRow) => void }) 
         <div className="text-center">
           <h1 className="text-3xl">Who&apos;s answering?</h1>
           <p className="mx-auto mt-2 max-w-[42ch] text-sm text-vi-muted">
-            So the UX team can follow up on your answers — especially the ones
+            So the UX team can follow up on your answers, especially the ones
             that point to specific clients.
           </p>
         </div>

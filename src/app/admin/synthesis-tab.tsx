@@ -8,7 +8,7 @@ import type { AdminData } from "./page";
 function respondentLabel(r: ResponseRow) {
   return r.mode === "live"
     ? `${r.session_name || "Live session"} · ${r.name}`
-    : `${r.name} — ${r.role}${r.team ? `, ${r.team}` : ""}`;
+    : `${r.name} · ${r.role}${r.team ? `, ${r.team}` : ""}`;
 }
 
 export default function SynthesisTab({ data }: { data: AdminData }) {
@@ -57,7 +57,7 @@ export default function SynthesisTab({ data }: { data: AdminData }) {
       {/* S1–S12 tracker */}
       <section className="rounded-2xl border border-vi-border bg-white p-5">
         <h3 className="font-heading text-base font-bold">
-          Report resolution tracker — Section 6 (S1–S12)
+          Report resolution tracker: Section 6 (S1–S12)
         </h3>
         <p className="mt-0.5 text-xs text-vi-muted">
           An item resolves when every question mapped to it has at least one

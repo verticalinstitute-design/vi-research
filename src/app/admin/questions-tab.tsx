@@ -102,7 +102,7 @@ export default function QuestionsTab({
     setNotice(
       result.deleted
         ? `${q.code} deleted.`
-        : `${q.code} deactivated — its existing answers are preserved.`
+        : `${q.code} deactivated. Its existing answers are preserved.`
     );
     await reload();
   };
@@ -179,7 +179,7 @@ export default function QuestionsTab({
           <textarea
             value={form.helper}
             onChange={(e) => setForm({ ...form, helper: e.target.value })}
-            placeholder='Helper — "why we&apos;re asking"'
+            placeholder='Helper: "why we&apos;re asking"'
             rows={2}
             className="mt-3 w-full rounded-lg border border-vi-border px-3 py-2 text-sm"
           />

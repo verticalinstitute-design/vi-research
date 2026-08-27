@@ -8,7 +8,7 @@ function respondentLabel(r: ResponseRow): string {
   if (r.mode === "live") {
     return `${r.session_name || "Live session"} (facilitated by ${r.name})`;
   }
-  return `${r.name} — ${r.role}${r.team ? `, ${r.team}` : ""}`;
+  return `${r.name} · ${r.role}${r.team ? `, ${r.team}` : ""}`;
 }
 
 function flatRows(
@@ -58,7 +58,7 @@ function toMarkdown(
   answers: Answer[]
 ): string {
   const lines: string[] = [
-    "# VI Research Platform — B2B research answers",
+    "# VI Research Platform: B2B research answers",
     "",
     `Exported ${new Date().toISOString().slice(0, 10)} · ${responses.length} responses`,
     "",
@@ -70,7 +70,7 @@ function toMarkdown(
       lines.push(`## ${currentTheme}`, "");
     }
     lines.push(`### ${q.code} · ${q.prompt}`, "");
-    lines.push(`_Sources: ${q.source_refs.join(", ") || "—"}_`, "");
+    lines.push(`_Sources: ${q.source_refs.join(", ") || "none"}_`, "");
     let any = false;
     for (const r of responses) {
       const a = answers.find(

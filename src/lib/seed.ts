@@ -24,14 +24,14 @@ export const SEED_QUESTIONS: SeedQuestion[] = [
     prompt:
       "Walk us through the last 3 corporate deals, from first touch to signed. Where did the website appear, if at all?",
     helper:
-      "Tells us whether the website's B2B job is inbound capture or credibility validation around a sales touch — this decides what we optimise for.",
+      "Tells us whether the website's B2B job is inbound capture or credibility validation around a sales touch. This decides what we optimise for.",
     source_refs: ["S1", "Q1"],
   },
   {
     code: "A2",
     theme: THEMES.A,
     prompt:
-      "Who's in the room on the buyer side — HR, L&D, department heads, finance, C-level? Who champions, who blocks, and who signs off?",
+      "Who's in the room on the buyer side: HR, L&D, department heads, finance, C-level? Who champions, who blocks, and who signs off?",
     helper:
       "Buying-committee roles shape who each page must convince, and which value props go where.",
     source_refs: ["Q2", "S11"],
@@ -57,7 +57,7 @@ export const SEED_QUESTIONS: SeedQuestion[] = [
     code: "B1",
     theme: THEMES.B,
     prompt:
-      "What are the top 3 objections you hear — and your current best rebuttals for each?",
+      "What are the top 3 objections you hear, and your current best rebuttals for each?",
     helper:
       "Objection-handling sections and proof priorities on the site come straight from this.",
     source_refs: ["S3", "Q5"],
@@ -73,7 +73,7 @@ export const SEED_QUESTIONS: SeedQuestion[] = [
     code: "B3",
     theme: THEMES.B,
     prompt:
-      "When we win, what's the stated reason? Honestly — how much of it is subsidy economics?",
+      "When we win, what's the stated reason? Honestly, how much of it is subsidy economics?",
     helper:
       "Sets the hero and differentiation honestly: outcome-led vs subsidy-led framing.",
     source_refs: ["S4", "Q7"],
@@ -117,7 +117,7 @@ export const SEED_QUESTIONS: SeedQuestion[] = [
     prompt:
       "Do we deliver any post-training reporting to clients today? What does it look like?",
     helper:
-      "A measurement/reporting block is a best-practice pattern — we need to know current practice before promising it.",
+      "A measurement/reporting block is a best-practice pattern. We need to know current practice before promising it.",
     source_refs: ["Q12"],
   },
   {
@@ -125,7 +125,7 @@ export const SEED_QUESTIONS: SeedQuestion[] = [
     theme: THEMES.D,
     prompt:
       "Which 3 past clients would make a strong story AND would likely say yes? Can you name a sponsor contact for each?",
-    helper: "The pipeline for the case-study hub — target 2–3 named stories.",
+    helper: "The pipeline for the case-study hub (target 2–3 named stories).",
     source_refs: ["S7", "Q13"],
   },
   {
@@ -140,7 +140,7 @@ export const SEED_QUESTIONS: SeedQuestion[] = [
     code: "D3",
     theme: THEMES.D,
     prompt:
-      "What's the exact logo/testimonial permission status — and are the deck logos (Singtel, Meta, IBM, DBS, JPM, Samsung, LinkedIn, Citi, Micron) corporate clients or alumni employers?",
+      "What's the exact logo/testimonial permission status, and are the deck logos (Singtel, Meta, IBM, DBS, JPM, Samsung, LinkedIn, Citi, Micron) corporate clients or alumni employers?",
     helper: "Determines the client logo wall we can ship.",
     source_refs: ["S9", "Q15"],
   },
@@ -150,7 +150,7 @@ export const SEED_QUESTIONS: SeedQuestion[] = [
     prompt:
       "What are the correct facts for the GovTech and CDL engagements (programme + headcount)? Our website surfaces currently disagree.",
     helper:
-      "Trust-critical: at least one page has swapped client content — same-week fix once confirmed.",
+      "Trust-critical: at least one page has swapped client content. Same-week fix once confirmed.",
     source_refs: ["S12", "Q16"],
   },
   {
@@ -180,7 +180,7 @@ export const SEED_QUESTIONS: SeedQuestion[] = [
     code: "E3",
     theme: THEMES.E,
     prompt:
-      "SFEC refresh H2 2026 — how do we plan to use it, and when should the website be ready?",
+      "SFEC refresh H2 2026: how do we plan to use it, and when should the website be ready?",
     helper: "Times the funding guide and calculator work.",
     source_refs: ["Q20"],
   },

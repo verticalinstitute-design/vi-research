@@ -97,7 +97,7 @@ export default function ResponsesTab({ data }: { data: AdminData }) {
                           )}
                           {a.speaker && (
                             <span className="text-xs font-normal text-vi-muted">
-                              — {a.speaker}
+                              · {a.speaker}
                             </span>
                           )}
                         </dt>

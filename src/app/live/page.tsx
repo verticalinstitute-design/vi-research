@@ -247,7 +247,7 @@ export default function LivePage() {
             <textarea
               value={draft.body}
               onChange={(e) => update(active.id, { body: e.target.value })}
-              placeholder="Notes from the room — capture verbatims where you can…"
+              placeholder="Notes from the room: capture verbatims where you can…"
               rows={10}
               className="mt-4 w-full rounded-xl border border-vi-border p-4 text-[15px] leading-relaxed transition focus:border-vi-primary"
             />
@@ -436,7 +436,7 @@ function SessionSetup({ onCreated }: { onCreated: (r: ResponseRow) => void }) {
                     addAttendee();
                   }
                 }}
-                placeholder="Name — press Enter to add"
+                placeholder="Name (press Enter to add)"
                 className="w-full rounded-xl border border-vi-border p-3 transition focus:border-vi-primary"
               />
               <button
