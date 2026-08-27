@@ -12,9 +12,14 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-vi-ice">
       <div className="mx-auto flex min-h-screen max-w-2xl flex-col justify-center px-6 py-16">
-        <p className="eyebrow text-vi-primary">
-          Vertical Institute · Internal research
-        </p>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/vi-logo.png"
+          alt="Vertical Institute"
+          width={121}
+          height={36}
+        />
+        <p className="eyebrow mt-4 text-vi-primary">Internal research</p>
         <h1 className="mt-3 text-4xl leading-tight tracking-tight sm:text-5xl">
           Help us rebuild the corporate website around what actually happens in
           your deals.

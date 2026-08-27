@@ -64,11 +64,16 @@ export default function AdminPage() {
     <main className="min-h-screen bg-vi-ice">
       <header className="border-b border-vi-border bg-white">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-4">
-          <div>
-            <p className="eyebrow text-vi-primary">VI Research Platform · Admin</p>
-            <h1 className="font-heading text-xl font-bold">
-              B2B research console
-            </h1>
+          <div className="flex items-center gap-3.5">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/vi-logo.png" alt="Vertical Institute" width={80} height={24} />
+            <div className="h-6 w-px bg-vi-border" aria-hidden />
+            <div>
+              <p className="eyebrow text-vi-primary">Research Platform · Admin</p>
+              <h1 className="font-heading text-xl font-bold">
+                B2B research console
+              </h1>
+            </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Link
