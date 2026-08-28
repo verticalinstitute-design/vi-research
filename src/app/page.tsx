@@ -26,8 +26,8 @@ export default function Home() {
         </h1>
         <p className="mt-5 max-w-xl text-lg text-vi-muted">
           About your corporate deals: buyers, objections, proof, and what
-          would help you sell. Your answers feed directly into the B2B
-          website revamp.
+          would help you sell. Your answers shape a website built to bring
+          in more, better-qualified leads.
         </p>
 
         <div className="mt-8 rounded-2xl border border-vi-border bg-white p-6 shadow-[var(--shadow-card)]">
